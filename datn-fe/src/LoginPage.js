@@ -11,6 +11,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
 import Box from "@mui/material/Box";
+import axios from "axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,12 +19,28 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
-    console.log(email, password);
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === "admin@example.com" && password === "password123") {
-      alert("Đăng nhập thành công!");
-    } else {
+
+    try {
+      console.log("email", email);
+      console.log("password", password);
+      const loginResponse = await axios.post(
+        "https://datn-be-3ju1.onrender.com/verify/login",
+        {
+          username: email,
+          password: password,
+        }
+      );
+
+      if (loginResponse.data.success) {
+        alert("Đăng nhập thành công!");
+      }
+    } catch (error) {
+      console.error(
+        "Lỗi đăng nhập:",
+        error.response ? error.response.data : error.message
+      );
       setError("Email hoặc mật khẩu không đúng.");
     }
   };
@@ -106,7 +123,7 @@ export default function LoginPage() {
             variant="contained"
             endIcon={<LoginIcon />}
             type="submit"
-            sx={{mt: 1}}
+            sx={{ mt: 1 }}
           >
             Đăng nhập
           </Button>
