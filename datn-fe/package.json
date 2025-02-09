@@ -11,12 +11,15 @@
     "cra-template": "1.2.0",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.7",
+    "i18next": "^24.2.2",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^15.4.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
+    "typescript": "^5.7.3",
     "web-vitals": "^4.2.4"
   },
   "scripts": {

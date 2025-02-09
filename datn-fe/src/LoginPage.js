@@ -14,12 +14,25 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import MenuItem from "@mui/material/MenuItem";
 
+const language = [
+  {
+    value: "en",
+    label: "English",
+  },
+  {
+    value: "vi",
+    label: "Vietnamese",
+  },
+];
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,10 +54,15 @@ export default function LoginPage() {
         "Lỗi đăng nhập:",
         error.response ? error.response.data : error.message
       );
-      setError("Incorrect username or password");
+      setError(t('verifyError.incorrectUsernameOrPassword'));
     }
   };
 
+   const handleLanguageChange = (e) => {
+    console.log(e);
+    e.preventDefault();
+    i18n.changeLanguage(e.target.value);
+   }
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleMouseDownPassword = (event) => event.preventDefault();
   const handleMouseUpPassword = (event) => event.preventDefault();
@@ -75,11 +93,11 @@ export default function LoginPage() {
             justifyItems: "center",
           }}
         >
-          <h2 className="text-2xl font-bold mb-2">Log in</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("login")}</h2>
           <form onSubmit={handleLogin} className="space-y-4">
             <TextField
               fullWidth
-              label="Email"
+              label={t("username")}
               variant="filled"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +105,7 @@ export default function LoginPage() {
             />
             <FormControl fullWidth variant="filled">
               <InputLabel htmlFor="filled-adornment-password">
-                Password{" "}
+                {t("password")}{" "}
               </InputLabel>
               <FilledInput
                 sx={{ mb: 1 }}
@@ -125,7 +143,7 @@ export default function LoginPage() {
               type="submit"
               sx={{ m: 1 }}
             >
-              Log in{" "}
+              {t("login")}
             </Button>
           </form>
           <Link
@@ -140,7 +158,7 @@ export default function LoginPage() {
             underline="hover"
             style={{ textAlign: "center", display: "block" }}
           >
-            Forgot password?
+            {t("forgotPassword")}
           </Link>
         </Box>
         <Button
@@ -150,8 +168,23 @@ export default function LoginPage() {
           sx={{ m: 2, maxWidth: "400px" }}
           onClick={handleRegisterClick}
         >
-          Register
+          {t("register")}
         </Button>
+        <TextField
+          id="outlined-select-currency"
+          select
+          label="Select"
+          defaultValue="en"
+          helperText={t("chooseLanguage")}
+          sx={{ mt: 2 }}
+          onChange={handleLanguageChange}
+        >
+          {language.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
     </div>
   );

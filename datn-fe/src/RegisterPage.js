@@ -13,6 +13,19 @@ import LoginIcon from "@mui/icons-material/Login";
 import Box from "@mui/material/Box";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import MenuItem from "@mui/material/MenuItem";
+
+const language = [
+  {
+    value: "en",
+    label: "English",
+  },
+  {
+    value: "vi",
+    label: "Vietnamese",
+  },
+];
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -20,18 +33,24 @@ export default function RegisterPage() {
   const [retypePassword, setRetypePassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
+  const navigate = useNavigate();
+  const handleLanguageChange = (e) => {
+    console.log(e);
+    e.preventDefault();
+    i18n.changeLanguage(e.target.value);
+  };
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       if (password !== retypePassword) {
-        setError("Passwords do not match");
+        setError(t("verifyError.passwordsNotMatch"));
         return;
       }
       if (password.length < 6) {
-        setError("Password must be at least 6 characters");
+        setError(t("verifyError.passwordMinLength"));
         return;
       }
       const registerResponse = await axios.post(
@@ -45,13 +64,11 @@ export default function RegisterPage() {
         navigate("/login");
       }
     } catch (error) {
-      console.log(error);
 
       console.error(
         "Lỗi đăng nhập:",
         error.response ? error.response.data : error.message
       );
-      console.log(error);
       setError(error.response.data.message);
     }
   };
@@ -82,11 +99,11 @@ export default function RegisterPage() {
             justifyItems: "center",
           }}
         >
-          <h2 className="text-2xl font-bold mb-2">Register</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("register")}</h2>
           <form onSubmit={handleRegister} className="space-y-4">
             <TextField
               fullWidth
-              label="Email"
+              label={t("username")}
               variant="filled"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -94,7 +111,7 @@ export default function RegisterPage() {
             />
             <FormControl fullWidth variant="filled">
               <InputLabel htmlFor="filled-adornment-password">
-                Password{" "}
+                {t("password")}{" "}
               </InputLabel>
               <FilledInput
                 sx={{ mb: 2 }}
@@ -118,7 +135,7 @@ export default function RegisterPage() {
             </FormControl>
             <FormControl fullWidth variant="filled">
               <InputLabel htmlFor="filled-adornment-password">
-                Retype password{" "}
+                {t("retypePassword")}{" "}
               </InputLabel>
               <FilledInput
                 sx={{ mb: 2 }}
@@ -156,10 +173,25 @@ export default function RegisterPage() {
               type="submit"
               //sx={{ mt: 2 }}
             >
-              Register{" "}
+              {t("register")}
             </Button>
           </form>
         </Box>
+        <TextField
+          id="outlined-select-currency"
+          select
+          label="Select"
+          defaultValue="en"
+          helperText={t("chooseLanguage")}
+          sx={{ mt: 3 }}
+          onChange={handleLanguageChange}
+        >
+          {language.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
     </div>
   );

@@ -1,0 +1,12 @@
+{
+  "login": "Login",
+  "register": "Register",
+  "username": "Username",
+  "password": "Password",
+  "forgotPassword": "Forgot password?",
+  "chooseLanguage": "Choose your language",
+  "verifyError.passwordsNotMatch": "Passwords do not match",
+  "retypePassword": "Retype password",
+  "verifyError.passwordMinLength": "Password must be at least 6 characters",
+  "verifyError.incorrectUsernameOrPassword": "Incorrect username or password"
+}

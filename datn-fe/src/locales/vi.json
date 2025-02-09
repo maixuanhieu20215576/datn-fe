@@ -1,0 +1,12 @@
+{
+  "login": "Đăng nhập",
+  "register": "Đăng ký",
+  "username": "Tên đăng nhập",
+  "password": "Mật khẩu",
+  "forgotPassword": "Quên mật khẩu?",
+  "chooseLanguage": "Chọn ngôn ngữ của bạn",
+  "verifyError.passwordsNotMatch": "Mật khẩu không khớp",
+  "retypePassword": "Nhập lại mật khẩu",
+  "verifyError.passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+  "verifyError.incorrectUsernameOrPassword": "Incorrect username or password"
+}
