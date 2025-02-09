@@ -11,37 +11,48 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [retypePassword, setRetypePassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-      const loginResponse = await axios.post(
-        "https://datn-be-3ju1.onrender.com/verify/login",
+      if (password !== retypePassword) {
+        setError("Passwords do not match");
+        return;
+      }
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters");
+        return;
+      }
+      const registerResponse = await axios.post(
+        "https://datn-be-3ju1.onrender.com/verify/register",
         {
           username: email,
           password: password,
         }
       );
-
-      if (loginResponse.data.success) {
-        alert("Đăng nhập thành công!");
+      if (registerResponse.data.user) {
+        navigate("/login");
       }
     } catch (error) {
+      console.log(error);
+
       console.error(
         "Lỗi đăng nhập:",
         error.response ? error.response.data : error.message
       );
-      setError("Incorrect username or password");
+      console.log(error);
+      setError(error.response.data.message);
     }
   };
 
@@ -49,10 +60,6 @@ export default function LoginPage() {
   const handleMouseDownPassword = (event) => event.preventDefault();
   const handleMouseUpPassword = (event) => event.preventDefault();
 
-  const navigate = useNavigate();
-  const handleRegisterClick = () => {
-    navigate("/register");
-  };
   return (
     <div>
       <Box
@@ -75,26 +82,50 @@ export default function LoginPage() {
             justifyItems: "center",
           }}
         >
-          <h2 className="text-2xl font-bold mb-2">Log in</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <h2 className="text-2xl font-bold mb-2">Register</h2>
+          <form onSubmit={handleRegister} className="space-y-4">
             <TextField
               fullWidth
               label="Email"
               variant="filled"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              sx={{ mb: 3 }}
+              sx={{ mb: 2 }}
             />
             <FormControl fullWidth variant="filled">
               <InputLabel htmlFor="filled-adornment-password">
                 Password{" "}
               </InputLabel>
               <FilledInput
-                sx={{ mb: 1 }}
+                sx={{ mb: 2 }}
                 id="filled-adornment-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      onMouseUp={handleMouseUpPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+            <FormControl fullWidth variant="filled">
+              <InputLabel htmlFor="filled-adornment-password">
+                Retype password{" "}
+              </InputLabel>
+              <FilledInput
+                sx={{ mb: 2 }}
+                id="filled-adornment-password"
+                type={showPassword ? "text" : "password"}
+                value={retypePassword}
+                onChange={(e) => setRetypePassword(e.target.value)}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -123,35 +154,12 @@ export default function LoginPage() {
               variant="contained"
               endIcon={<LoginIcon />}
               type="submit"
-              sx={{ m: 1 }}
+              //sx={{ mt: 2 }}
             >
-              Log in{" "}
+              Register{" "}
             </Button>
           </form>
-          <Link
-            fullWidth
-            variant="text"
-            sx={{ mt: 1 }}
-            onClick={() =>
-              alert("Chức năng quên mật khẩu chưa được triển khai.")
-            }
-            component="href"
-            href="#"
-            underline="hover"
-            style={{ textAlign: "center", display: "block" }}
-          >
-            Forgot password?
-          </Link>
         </Box>
-        <Button
-          fullWidth
-          variant="contained"
-          color="secondary"
-          sx={{ m: 2, maxWidth: "400px" }}
-          onClick={handleRegisterClick}
-        >
-          Register
-        </Button>
       </Box>
     </div>
   );
