@@ -16,6 +16,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import MenuItem from "@mui/material/MenuItem";
+import { useSession } from "../../utils/SessionContext";
 
 const language = [
   {
@@ -33,7 +34,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { t, i18n } = useTranslation();
-
+  const { session, setSession } = useSession();
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -45,24 +46,38 @@ export default function LoginPage() {
           password: password,
         }
       );
+      console.log(loginResponse);
+      if (loginResponse.status === 200) {
+        const { accessToken, user } = loginResponse.data;
+        localStorage.setItem("accessToken", accessToken);
+        await setSession({
+          user: {
+            name: user.username,
+            image: user.avatar,
+            email: user.email,
+          },
+        });
+        await localStorage.setItem("user", JSON.stringify(user));
+        const userInLocalStorage = JSON.parse(localStorage.getItem("user"));
+        console.log("userInLocalStorage", userInLocalStorage);
 
-      if (loginResponse.data.success) {
-        alert("Đăng nhập thành công!");
+        console.log("redirecting to home");
+        setTimeout(() => navigate("/"), 100);
       }
     } catch (error) {
       console.error(
         "Lỗi đăng nhập:",
         error.response ? error.response.data : error.message
       );
-      setError(t('verifyError.incorrectUsernameOrPassword'));
+      setError(t("verifyError.incorrectUsernameOrPassword"));
     }
   };
 
-   const handleLanguageChange = (e) => {
+  const handleLanguageChange = (e) => {
     console.log(e);
     e.preventDefault();
     i18n.changeLanguage(e.target.value);
-   }
+  };
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleMouseDownPassword = (event) => event.preventDefault();
   const handleMouseUpPassword = (event) => event.preventDefault();
@@ -171,7 +186,7 @@ export default function LoginPage() {
           {t("register")}
         </Button>
         <TextField
-          id="outlined-select-currency"
+          id="outlined-select-language"
           select
           label="Select"
           defaultValue="en"

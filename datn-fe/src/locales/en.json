@@ -8,5 +8,6 @@
   "verifyError.passwordsNotMatch": "Passwords do not match",
   "retypePassword": "Retype password",
   "verifyError.passwordMinLength": "Password must be at least 6 characters",
-  "verifyError.incorrectUsernameOrPassword": "Incorrect username or password"
+  "verifyError.incorrectUsernameOrPassword": "Incorrect username or password",
+  "dashboard.welcomeText": " Our website is an online platform designed for learners of all levels, from beginners to those looking to enhance their speaking and writing skills in English. With a wide variety of lessons, diverse vocabulary, and quizzes to help you practice, we are committed to providing an engaging and effective learning environment."
 }
