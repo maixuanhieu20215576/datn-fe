@@ -6,9 +6,11 @@ export const SessionProvider = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [session, setSession] = useState({
     user: {
+      _id: user?._id,
       name: user?.username || "Guest",
       image: user?.avatar || "",
       email: user?.email || "",
+      language: user?.language || "en",
     },
   });
 

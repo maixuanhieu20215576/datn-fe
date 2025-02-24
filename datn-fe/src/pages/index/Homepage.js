@@ -72,7 +72,6 @@ DemoPageContent.propTypes = {
 
 function AccountSidebarPreview(props) {
   const { handleClick, open, mini } = props;
-  console.log(mini);
   return (
     <Stack direction="column" p={0}>
       <Divider />
@@ -190,10 +189,9 @@ function DashboardLayoutAccountSidebar(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   const { session, setSession } = useSession();
+  console.log(session);
 
-  // const [session, setSession] = React.useState(demoSession);
   const authentication = React.useMemo(() => {
-    console.log(session);
     return {
       signIn: () => {
         setSession(session);

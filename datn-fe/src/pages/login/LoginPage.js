@@ -46,22 +46,20 @@ export default function LoginPage() {
           password: password,
         }
       );
-      console.log(loginResponse);
       if (loginResponse.status === 200) {
         const { accessToken, user } = loginResponse.data;
         localStorage.setItem("accessToken", accessToken);
         await setSession({
           user: {
+            _id: user._id,
             name: user.username,
             image: user.avatar,
             email: user.email,
+            language: user.language,
           },
         });
+        console.log(session)
         await localStorage.setItem("user", JSON.stringify(user));
-        const userInLocalStorage = JSON.parse(localStorage.getItem("user"));
-        console.log("userInLocalStorage", userInLocalStorage);
-
-        console.log("redirecting to home");
         setTimeout(() => navigate("/"), 100);
       }
     } catch (error) {

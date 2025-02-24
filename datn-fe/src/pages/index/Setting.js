@@ -12,6 +12,7 @@ import { Avatar } from "@mui/material";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
 import { useSession } from "../../utils/SessionContext";
+import { fetchUserData } from "../../utils/UserUtils";
 
 const languageMap = [
   { value: "en", label: "English" },
@@ -19,26 +20,48 @@ const languageMap = [
 ];
 
 export default function Setting() {
+  const { session, setSession } = useSession();
+  const [userSetting, setUserSetting] = React.useState(null);
+  React.useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await fetchUserData(session.user._id);
+        setUserSetting(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+    if (session?.user?._id) {
+      fetchData();
+    }
+  }, [session?.user?._id]);
+
   const user = JSON.parse(localStorage.getItem("user"));
   const [expanded, setExpanded] = React.useState(false);
-  const [language, setLanguage] = React.useState(user?.language || "en");
-  const [email, setEmail] = React.useState(user?.email || "example@gmail.com");
+  const [language, setLanguage] = React.useState("en"); // Default value
+  const [email, setEmail] = React.useState("example@gmail.com");
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAvatarEditing, setAvatarIsEditing] = React.useState(false);
   const [avatar, setAvatar] = React.useState(
-    user?.avatar ||
-      "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
+    "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
   );
   const [previewAvatar, setPreviewAvatar] = React.useState(
-    user?.avatar ||
-      "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
+    "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
   );
-  const { session, setSession } = useSession();
+
+  React.useEffect(() => {
+    if (userSetting) {
+      console.log(userSetting);
+      setLanguage(userSetting.language);
+      setEmail(userSetting.email);
+      setAvatar(userSetting.avatar);
+      setPreviewAvatar(userSetting.avatar);
+    }
+  }, [userSetting]);
 
   const fileInputRef = React.useRef(null);
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
-    setEmail(event.target.value);
   };
   const toggleEdit = () => {
     if (isEditing && !validateEmail(email)) {
@@ -74,7 +97,7 @@ export default function Setting() {
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
-  }
+  };
 
   const handleLanguageOnChange = (event) => {
     setLanguage(event.target.value);
@@ -94,7 +117,6 @@ export default function Setting() {
     formData.append("email", email || user.email);
     formData.append("language", language || user.language);
     formData.append("image", avatar || user.avatar); // avatarFile là file ảnh bạn chọn
-
     try {
       const response = await axios.post(
         `https://datn-be-3ju1.onrender.com/user`,
@@ -107,15 +129,16 @@ export default function Setting() {
           timeout: 5000,
         }
       );
-      alert("Cài đặt đã được lưu thành công!");
       setSession({
         user: {
+          _id: response.data.updatedUser._id,
           name: response.data.updatedUser.username,
           image: response.data.updatedUser.avatar,
           email: response.data.updatedUser.email,
+          language: response.data.updatedUser.language,
         },
       });
-      console.log(response.data.updatedUser);
+      alert("Cài đặt đã được lưu thành công!");
     } catch (error) {
       alert("Đã xảy ra lỗi khi lưu cài đặt!", error);
     }
@@ -125,6 +148,7 @@ export default function Setting() {
       if (previewAvatar) URL.revokeObjectURL(previewAvatar);
     };
   }, [previewAvatar]);
+
   return (
     <Box sx={{ p: 3, ml: 3, mt: 3 }}>
       <Accordion
@@ -149,7 +173,7 @@ export default function Setting() {
             <TextField
               id="outlined-select-language"
               select
-              defaultValue={user?.language || "en"}
+              value={language}
               onChange={handleLanguageOnChange}
             >
               {languageMap.map((option) => (
