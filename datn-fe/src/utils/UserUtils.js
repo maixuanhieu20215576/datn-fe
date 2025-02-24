@@ -1,6 +1,6 @@
 export async function fetchUserData(userId) {
   try {
-    const response = await fetch(`http://localhost:3100/user/${userId}`);
+    const response = await fetch(`https://datn-be-3ju1.onrender.com/user/${userId}`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
