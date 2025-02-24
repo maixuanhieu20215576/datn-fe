@@ -1,6 +1,6 @@
 export async function fetchUserData(userId) {
   try {
-    const response = await fetch(`https://datn-be-3ju1.onrender.com/user/${userId}`);
+    const response = await fetch(`${process.env.REACT_APP_BASE_URL}/user/${userId}`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }

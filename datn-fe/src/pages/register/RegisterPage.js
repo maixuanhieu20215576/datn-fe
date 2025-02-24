@@ -54,7 +54,7 @@ export default function RegisterPage() {
         return;
       }
       const registerResponse = await axios.post(
-        "https://datn-be-3ju1.onrender.com/verify/register",
+        `${process.env.REACT_APP_BASE_URL}/verify/register`,
         {
           username: email,
           password: password,
@@ -64,7 +64,6 @@ export default function RegisterPage() {
         navigate("/login");
       }
     } catch (error) {
-
       console.error(
         "Lỗi đăng nhập:",
         error.response ? error.response.data : error.message

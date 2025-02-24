@@ -119,7 +119,7 @@ export default function Setting() {
     formData.append("image", avatar || user.avatar); // avatarFile là file ảnh bạn chọn
     try {
       const response = await axios.post(
-        `https://datn-be-3ju1.onrender.com/user`,
+        `${process.env.REACT_APP_BASE_URL}/user`,
         formData,
         {
           headers: {

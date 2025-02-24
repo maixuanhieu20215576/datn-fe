@@ -40,7 +40,7 @@ export default function LoginPage() {
 
     try {
       const loginResponse = await axios.post(
-        "https://datn-be-3ju1.onrender.com/verify/login",
+        `${process.env.REACT_APP_BASE_URL}/verify/login`,
         {
           username: email,
           password: password,
@@ -58,7 +58,7 @@ export default function LoginPage() {
             language: user.language,
           },
         });
-        console.log(session)
+        console.log(session);
         await localStorage.setItem("user", JSON.stringify(user));
         setTimeout(() => navigate("/"), 100);
       }
