@@ -23,10 +23,21 @@ import TextField from "@mui/material/TextField";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid2";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const StyledTypography = styled(Typography)({
   color: "#636e72",
   fontWeight: "bold", // If you want the text to be bold
+});
+
+const ContainerGrid = styled(Grid)({
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  alignContent: "center",
+  justifyContent: "center",
+  flexWrap: "wrap",
+  width: "100%",
 });
 
 const languageWithFlagMap = {
@@ -53,7 +64,7 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 export default function ApplyTeaching() {
-  const [teachingLanguage, setTeachingLanguage] = React.useState("");
+  const [teachingLanguage, setTeachingLanguage] = React.useState([""]);
   const [CV, setCV] = React.useState(null);
   const [previewCVName, setPreviewCVName] = React.useState("Upload Your CV");
   const [CvError, setCvError] = React.useState("");
@@ -73,9 +84,11 @@ export default function ApplyTeaching() {
   const handleCompleteSubmittion = () => {
     setDialogOpen(false);
   };
-  const handleTeachingLanguageChange = (event) => {
-    console.log(event);
-    setTeachingLanguage(event.target.value);
+  const handleTeachingLanguageChange = (index, event) => {
+    const newLanguages = [...teachingLanguage];
+    newLanguages[index] = event.target.value;
+    setTeachingLanguage(newLanguages);
+    console.log(teachingLanguage);
   };
 
   const handleTeachingCommitmentChange = (event) => {
@@ -108,6 +121,15 @@ export default function ApplyTeaching() {
   const handleLanguageSkillsChange = (event) => {
     setLanguageSkills(event.target.value);
   };
+  const handleAddLanguage = () => {
+    setTeachingLanguage([...teachingLanguage, ""]); // Add a new empty string
+  };
+
+  const handleDeleteLanguage = (index) => {
+    const newLanguages = teachingLanguage.filter((_, i) => i !== index);
+    setTeachingLanguage(newLanguages);
+  };
+
   return (
     <Box
       sx={{
@@ -145,190 +167,219 @@ export default function ApplyTeaching() {
           alignItems: "center",
           alignContent: "center",
           justifyContent: "center",
+          flexWrap: "wrap",
+          width: "100%",
         }}
+        flexGrow={1}
       >
-        <StyledTypography sx={{}}>Teaching language:</StyledTypography>
-        <FormControl sx={{ m: 1, width: "20vw" }}>
-          <InputLabel id="demo-simple-select-label">Language</InputLabel>
-          <Select
-            value={teachingLanguage}
-            label="Teaching Language"
-            onChange={handleTeachingLanguageChange}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  maxHeight: 250, // Limit the height of dropdown to make it scrollable if needed
-                },
-              },
-              anchorOrigin: {
-                vertical: "bottom", // Ensure the dropdown opens from the bottom
-                horizontal: "left", // Align dropdown to the left (or use 'center' or 'right' as needed)
-              },
-              transformOrigin: {
-                vertical: "top", // Ensure the dropdown is positioned correctly relative to the select box
-                horizontal: "left",
-              },
-            }}
-          >
-            {Object.entries(languageWithFlagMap).map(
-              ([languageName, flag], index) => {
-                return (
-                  <MenuItem
-                    key={index}
-                    value={languageName} // You should probably use languageName as value
-                    sx={{ display: "flex" }}
-                  >
-                    {flag} {languageName}
-                  </MenuItem>
-                );
-              }
-            )}
-          </Select>
-        </FormControl>
-        <IconButton variant="contained">
-          <AddIcon />
-        </IconButton>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        {" "}
-        <StyledTypography>Teaching commitment: </StyledTypography>
-        <FormControl sx={{ width: "20vw", mt: 3, mr: 4, mb: 4, ml: 2 }}>
-          <InputLabel id="demo-simple-select-label">Commitment</InputLabel>
-          <Select
-            value={teachingCommitment}
-            label="Teaching commitment"
-            onChange={handleTeachingCommitmentChange}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  maxHeight: 250, // Limit the height of dropdown to make it scrollable if needed
-                },
-              },
-              anchorOrigin: {
-                vertical: "bottom", // Ensure the dropdown opens from the bottom
-                horizontal: "left", // Align dropdown to the left (or use 'center' or 'right' as needed)
-              },
-              transformOrigin: {
-                vertical: "top", // Ensure the dropdown is positioned correctly relative to the select box
-                horizontal: "left",
-              },
-            }}
-          >
-            <MenuItem value="partTime">Part-time</MenuItem>
-            <MenuItem value="fullTime">Full-time</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        <StyledTypography>Language skills: </StyledTypography>
-
-        <TextField
-          helperText="e.g: 750 TOEIC, 7.0 IELTS, etc."
-          id="outlined-multiline-static"
-          label="Language skills"
-          sx={{ width: "20vw", ml: 3, mb: 2 }}
-          multiline
-          rows={4}
-          value={languageSkills}
-          onChange={handleLanguageSkillsChange}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        {" "}
-        <StyledTypography sx={{ fontWeight: "bold" }}>
-          Your certificates:{" "}
-        </StyledTypography>
-        <Button
-          component="label"
-          role={undefined}
-          variant="contained"
-          tabIndex={-1}
-          startIcon={<CloudUploadIcon />}
+        <Grid
+          container
           sx={{
-            width: "20vw",
-            ml: 3,
+            alignItems: "center",
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+          spacing={2}
+          rowSpacing={3}
+        >
+          {teachingLanguage.map((language, index) => (
+            <ContainerGrid key={index} item lg={12} sx={{ ml: 6 }}>
+              {index === 0 && (
+                <Grid item lg={2}>
+                  <StyledTypography>Teaching language:</StyledTypography>
+                </Grid>
+              )}
+              {index !== 0 && (
+                <Grid item lg={2}>
+                  <StyledTypography sx={{ ml: 23 }}></StyledTypography>
+                </Grid>
+              )}
+              <Grid item lg={8}>
+                <FormControl sx={{ m: 1, width: "20vw" }}>
+                  <InputLabel id={`language-select-label-${index}`}>
+                    Language
+                  </InputLabel>
+                  <Select
+                    value={language}
+                    label="Teaching Language"
+                    onChange={(event) =>
+                      handleTeachingLanguageChange(index, event)
+                    }
+                    MenuProps={{
+                      PaperProps: {
+                        sx: { maxHeight: 250 },
+                      },
+                      anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                      transformOrigin: { vertical: "top", horizontal: "left" },
+                    }}
+                  >
+                    {Object.entries(languageWithFlagMap).map(
+                      ([languageName, flag], i) => (
+                        <MenuItem
+                          key={i}
+                          value={languageName}
+                          sx={{ display: "flex" }}
+                        >
+                          {flag} {languageName}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Add & Delete buttons */}
+
+              {teachingLanguage.length !== 1 && (
+                <Grid item lg={1}>
+                  <IconButton
+                    variant="contained"
+                    onClick={() => handleDeleteLanguage(index)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Grid>
+              )}
+              {index === teachingLanguage.length - 1 && (
+                <Grid item lg={1}>
+                  <IconButton
+                    variant="contained"
+                    onClick={() => handleAddLanguage()}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Grid>
+              )}
+            </ContainerGrid>
+          ))}
+
+          <ContainerGrid item lg={12}>
+            {" "}
+            <Grid item lg={4}>
+              <StyledTypography>Teaching commitment: </StyledTypography>
+            </Grid>
+            <Grid item lg={8}>
+              <FormControl sx={{ width: "20vw", mt: 3, mr: 4, mb: 4, ml: 2 }}>
+                <InputLabel id="demo-simple-select-label">
+                  Commitment
+                </InputLabel>
+                <Select
+                  value={teachingCommitment}
+                  label="Teaching commitment"
+                  onChange={handleTeachingCommitmentChange}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 250, // Limit the height of dropdown to make it scrollable if needed
+                      },
+                    },
+                    anchorOrigin: {
+                      vertical: "bottom", // Ensure the dropdown opens from the bottom
+                      horizontal: "left", // Align dropdown to the left (or use 'center' or 'right' as needed)
+                    },
+                    transformOrigin: {
+                      vertical: "top", // Ensure the dropdown is positioned correctly relative to the select box
+                      horizontal: "left",
+                    },
+                  }}
+                >
+                  <MenuItem value="partTime">Part-time</MenuItem>
+                  <MenuItem value="fullTime">Full-time</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </ContainerGrid>
+          <ContainerGrid item lg={12}>
+            {" "}
+            <Grid item lg={4}>
+              <StyledTypography>Language skills: </StyledTypography>
+            </Grid>
+            <Grid item lg={8}>
+              <TextField
+                helperText="e.g: 750 TOEIC, 7.0 IELTS, etc."
+                id="outlined-multiline-static"
+                label="Language skills"
+                sx={{ width: "20vw", ml: 3, mb: 2 }}
+                multiline
+                rows={4}
+                value={languageSkills}
+                onChange={handleLanguageSkillsChange}
+              />
+            </Grid>
+          </ContainerGrid>
+          <ContainerGrid item lg={12}>
+            {" "}
+            <Grid item lg={4}>
+              {" "}
+              <StyledTypography sx={{ fontWeight: "bold" }}>
+                Your certificates:{" "}
+              </StyledTypography>
+            </Grid>
+            <Grid item lg={8}>
+              {" "}
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  width: "20vw",
+                  ml: 3,
+                  backgroundColor: "#a29bfe",
+                  transition: "background-color 0.2s ease-in-out", // Hiệu ứng chuyển đổi màu
+                  "&:hover": {
+                    backgroundColor: "#00cec9", // Màu xanh lá khi hover
+                  },
+                }}
+              >
+                {previewCVName}
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={handleCVChange}
+                  multiple
+                  //   style={{ display: "none" }}
+                />
+              </Button>
+              {CvError && (
+                <Typography color="error">
+                  Please upload a valid CV file (pdf, doc, docx)
+                </Typography>
+              )}
+            </Grid>
+          </ContainerGrid>
+        </Grid>
+        <ContainerGrid item lg={12}>
+          <FormControlLabel
+            sx={{ marginTop: 2 }}
+            control={
+              <Checkbox
+                checked={isChecked}
+                onChange={handleChecked}
+                sx={{ "&.Mui-checked": { color: "#a29bfe" } }}
+              />
+            }
+            label="I guarantee that my certificates are authentic and valid."
+          />
+        </ContainerGrid>
+
+        <Button
+          variant="contained"
+          endIcon={<SendIcon />}
+          sx={{
             backgroundColor: "#a29bfe",
+            m: 3,
             transition: "background-color 0.2s ease-in-out", // Hiệu ứng chuyển đổi màu
             "&:hover": {
               backgroundColor: "#00cec9", // Màu xanh lá khi hover
             },
           }}
+          onClick={handleSendClick}
         >
-          {previewCVName}
-          <VisuallyHiddenInput
-            type="file"
-            onChange={handleCVChange}
-            multiple
-            //   style={{ display: "none" }}
-          />
+          Send
         </Button>
       </Box>
-      {CvError && (
-        <Typography color="error">
-          Please upload a valid CV file (pdf, doc, docx)
-        </Typography>
-      )}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        {" "}
-      </Box>
-      <FormControlLabel
-        sx={{ marginTop: 2 }}
-        control={
-          <Checkbox
-            checked={isChecked}
-            onChange={handleChecked}
-            sx={{ "&.Mui-checked": { color: "#a29bfe" } }}
-          />
-        }
-        label="I guarantee that my certificates are authentic and valid."
-      />
-      <Button
-        variant="contained"
-        endIcon={<SendIcon />}
-        sx={{
-          backgroundColor: "#a29bfe",
-          m: 3,
-          transition: "background-color 0.2s ease-in-out", // Hiệu ứng chuyển đổi màu
-          "&:hover": {
-            backgroundColor: "#00cec9", // Màu xanh lá khi hover
-          },
-        }}
-        onClick={handleSendClick}
-      >
-        Send
-      </Button>
+
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
