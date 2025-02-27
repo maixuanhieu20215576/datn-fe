@@ -59,8 +59,10 @@ export default function LoginPage() {
           },
         });
         console.log(session);
-        await localStorage.setItem("user", JSON.stringify(user));
-        setTimeout(() => navigate("/"), 100);
+        localStorage.setItem("user", JSON.stringify(user));
+        if (user.role === "student") {
+          setTimeout(() => navigate("/student"), 100);
+        }
       }
     } catch (error) {
       console.error(

@@ -8,6 +8,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import { useNavigate } from "react-router-dom";
 import {
   Account,
@@ -18,6 +19,7 @@ import {
 import Dashboard from "./Dashboard";
 import Setting from "./Setting";
 import Courses from "./Courses";
+import ApplyTeaching from "./ApplyTeaching";
 import { useSession } from "../../utils/SessionContext";
 
 const NAVIGATION = [
@@ -34,6 +36,11 @@ const NAVIGATION = [
     segment: "courses",
     title: "Courses",
     icon: <SchoolIcon />,
+  },
+  {
+    segment: "apply-teaching",
+    title: "Apply to be a teacher",
+    icon: <LocalLibraryIcon />,
   },
   { segment: "settings", title: "Setting", icon: <SettingsIcon /> },
 ];
@@ -63,6 +70,9 @@ function DemoPageContent({ pathname }) {
   }
   if (pathname === "/courses") {
     return <Courses />;
+  }
+  if (pathname === "/apply-teaching") {
+    return <ApplyTeaching />;
   }
 }
 
@@ -189,7 +199,6 @@ function DashboardLayoutAccountSidebar(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   const { session, setSession } = useSession();
-  console.log(session);
 
   const authentication = React.useMemo(() => {
     return {
