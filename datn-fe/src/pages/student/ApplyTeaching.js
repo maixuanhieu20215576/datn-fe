@@ -24,6 +24,11 @@ import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
+import Fade from "@mui/material/Fade";
+import axios from "axios";
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 
 const StyledTypography = styled(Typography)({
   color: "#636e72",
@@ -63,7 +68,20 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
+const fetchCurrentApplication = async (userId) => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_BASE_URL}/user/apply-teaching`,
+    {
+      headers: {
+        userId: userId,
+      },
+    }
+  );
+  console.log(response.data);
+  return response.data;
+};
 export default function ApplyTeaching() {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [teachingLanguage, setTeachingLanguage] = React.useState([""]);
   const [CV, setCV] = React.useState(null);
   const [previewCVName, setPreviewCVName] = React.useState("Upload Your CV");
@@ -72,8 +90,73 @@ export default function ApplyTeaching() {
   const [isChecked, setIsChecked] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [languageSkills, setLanguageSkills] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [success, setSuccess] = React.useState("");
+  const [sendButtonAvailable, setSendButtonAvailable] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchCurrentApplication(user._id).then((data) => {
+      setTeachingLanguage(
+        data.teachingLanguage.length ? data.teachingLanguage : [""]
+      );
+      setTeachingCommitment(data.commitment || "");
+      setPreviewCVName(data.CV ? "... " + data?.CV?.slice(-15) : "Upload your CV");
+
+      setLanguageSkills(data.languageSkills || "");
+      setIsChecked(true);
+      setSendButtonAvailable(!data.status);
+    });
+  }, [user._id]);
+  const applicationSend = async () => {
+    const formData = new FormData();
+    formData.append("teachingLanguage", teachingLanguage);
+    console.log(teachingLanguage);
+    formData.append("teachingCommitment", teachingCommitment);
+    formData.append("file", CV);
+    formData.append("languageSkills", languageSkills);
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/user/apply-teaching`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            userId: user._id,
+          },
+          timeout: 5000,
+        }
+      );
+      setSuccess("Your application has been sent successfully!");
+      setTimeout(() => {
+        setSuccess("");
+      }, 2000);
+      setSendButtonAvailable(false);
+    } catch (error) {
+      setError("Đã xảy ra lỗi khi gửi đơn!", error);
+      setTimeout(() => {
+        setError("");
+      }, 2000);
+    }
+  };
 
   const handleSendClick = () => {
+    const filteredTeachingLanguage = teachingLanguage.filter(
+      (language) => language !== ""
+    );
+    if (
+      filteredTeachingLanguage.length === 0 ||
+      teachingCommitment === "" ||
+      !isChecked ||
+      CV === null
+    ) {
+      setError("Please fill in all required fields.");
+      setTimeout(() => {
+        setError("");
+      }, 2000);
+
+      return;
+    }
     setDialogOpen(true);
   };
 
@@ -81,14 +164,14 @@ export default function ApplyTeaching() {
     setDialogOpen(false);
   };
 
-  const handleCompleteSubmittion = () => {
+  const handleCompleteSubmittion = async () => {
     setDialogOpen(false);
+    await applicationSend();
   };
   const handleTeachingLanguageChange = (index, event) => {
     const newLanguages = [...teachingLanguage];
     newLanguages[index] = event.target.value;
     setTeachingLanguage(newLanguages);
-    console.log(teachingLanguage);
   };
 
   const handleTeachingCommitmentChange = (event) => {
@@ -113,7 +196,8 @@ export default function ApplyTeaching() {
       setCvError("Please upload a file smaller than 5MB");
       return;
     }
-    setCV(event.target.files);
+    setCV(event.target.files[0]);
+    setCvError("");
     const previewCVNameBefore = event.target.files[0].name;
     setPreviewCVName("... " + previewCVNameBefore.slice(-15));
   };
@@ -130,6 +214,15 @@ export default function ApplyTeaching() {
     setTeachingLanguage(newLanguages);
   };
 
+  React.useEffect(() => {
+    if (error && error !== "") {
+      setShowAlert(true);
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
   return (
     <Box
       sx={{
@@ -142,6 +235,38 @@ export default function ApplyTeaching() {
         pb: 5,
       }}
     >
+      {showAlert && error !== "" && (
+        <Stack
+          sx={{
+            width: "50%",
+            position: "fixed",
+            // transform: "translateX(-50%)", // Center horizontally
+            mt: 3,
+            zIndex: 1000, // Ensure it appears above other elements
+          }}
+          spacing={2}
+        >
+          <Alert variant="filled" severity="error">
+            {error}
+          </Alert>
+        </Stack>
+      )}
+      {success && success !== "" && (
+        <Stack
+          sx={{
+            width: "50%",
+            position: "fixed",
+            // transform: "translateX(-50%)", // Center horizontally
+            mt: 3,
+            zIndex: 1000, // Ensure it appears above other elements
+          }}
+          spacing={2}
+        >
+          <Alert variant="filled" severity="success">
+            {success}
+          </Alert>
+        </Stack>
+      )}
       <Box sx={{ m: 3 }}>
         <img
           src={backgroundImage}
@@ -283,8 +408,8 @@ export default function ApplyTeaching() {
                     },
                   }}
                 >
-                  <MenuItem value="partTime">Part-time</MenuItem>
-                  <MenuItem value="fullTime">Full-time</MenuItem>
+                  <MenuItem value="Part-time">Part-time</MenuItem>
+                  <MenuItem value="Full-time">Full-time</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -365,9 +490,10 @@ export default function ApplyTeaching() {
 
         <Button
           variant="contained"
-          endIcon={<SendIcon />}
+          endIcon={sendButtonAvailable ? <SendIcon /> : <MarkEmailReadIcon />}
+          disabled={!sendButtonAvailable}
           sx={{
-            backgroundColor: "#a29bfe",
+            backgroundColor: sendButtonAvailable ? "#a29bfe" : "#636e72",
             m: 3,
             transition: "background-color 0.2s ease-in-out", // Hiệu ứng chuyển đổi màu
             "&:hover": {
@@ -376,10 +502,9 @@ export default function ApplyTeaching() {
           }}
           onClick={handleSendClick}
         >
-          Send
+          {sendButtonAvailable ? "Send" : "Your application has been received"}
         </Button>
       </Box>
-
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
@@ -403,7 +528,10 @@ export default function ApplyTeaching() {
           </Button>
           <Button
             onClick={handleCompleteSubmittion}
-            sx={{ color: "#00b894", fontWeight: "bold" }}
+            sx={{
+              color: "#00b894",
+              fontWeight: "bold",
+            }}
             autoFocus
           >
             Send
