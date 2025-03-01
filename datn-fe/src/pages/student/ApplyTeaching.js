@@ -80,6 +80,27 @@ const fetchCurrentApplication = async (userId) => {
   console.log(response.data);
   return response.data;
 };
+
+const getButtonBackgroundColorAndText = (applicationStatus) => {
+  console.log(applicationStatus);
+  switch (applicationStatus) {
+    case "Pending":
+      return { color: "#fdcb6e", text: "Your application has been received" }; // Màu vàng khi pending
+    case "Approved":
+      return {
+        color: "#00b894",
+        text: "Congratulations! Your application has been approved",
+      }; // Màu xanh khi dc approved
+    case "Rejected":
+      return {
+        color: "#d63031",
+        text: "Sorry, your application has been rejected",
+      }; // màu đỏ khi bị reject
+    default:
+      return { color: "#b2bec3", text: "Send" };
+  }
+};
+
 export default function ApplyTeaching() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [teachingLanguage, setTeachingLanguage] = React.useState([""]);
@@ -94,18 +115,22 @@ export default function ApplyTeaching() {
   const [showAlert, setShowAlert] = React.useState(false);
   const [success, setSuccess] = React.useState("");
   const [sendButtonAvailable, setSendButtonAvailable] = React.useState(true);
+  const [applicationStatus, setApplicationStatus] = React.useState("");
 
   React.useEffect(() => {
     fetchCurrentApplication(user._id).then((data) => {
       setTeachingLanguage(
         data.teachingLanguage.length ? data.teachingLanguage : [""]
       );
-      setTeachingCommitment(data.commitment || "");
-      setPreviewCVName(data.CV ? "... " + data?.CV?.slice(-15) : "Upload your CV");
+      setTeachingCommitment(data.teachingCommitment || "");
+      setPreviewCVName(
+        data.CV ? "... " + data?.CV?.slice(-15) : "Upload your CV"
+      );
 
       setLanguageSkills(data.languageSkills || "");
       setIsChecked(true);
       setSendButtonAvailable(!data.status);
+      setApplicationStatus(data.status || "");
     });
   }, [user._id]);
   const applicationSend = async () => {
@@ -497,12 +522,17 @@ export default function ApplyTeaching() {
             m: 3,
             transition: "background-color 0.2s ease-in-out", // Hiệu ứng chuyển đổi màu
             "&:hover": {
-              backgroundColor: "#00cec9", // Màu xanh lá khi hover
+              backgroundColor: sendButtonAvailable ? "#00cec9" : "#636e72", // Chỉ đổi màu khi không bị disabled
+            },
+            "&.Mui-disabled": {
+              backgroundColor:
+                getButtonBackgroundColorAndText(applicationStatus).color, // Bắt buộc màu khi button bị disabled
+              color: "#2d3436", // Màu chữ khi disabled
             },
           }}
           onClick={handleSendClick}
         >
-          {sendButtonAvailable ? "Send" : "Your application has been received"}
+          {getButtonBackgroundColorAndText(applicationStatus).text}
         </Button>
       </Box>
       <Dialog
