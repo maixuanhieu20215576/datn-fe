@@ -1,4 +1,5 @@
 import { Typography } from "@mui/material";
+import get from "lodash/get";
 import Box from "@mui/material/Box";
 import backgroundImage from "../../img/Screenshot 2025-02-24 163710.png";
 import * as React from "react";
@@ -119,18 +120,22 @@ export default function ApplyTeaching() {
 
   React.useEffect(() => {
     fetchCurrentApplication(user._id).then((data) => {
-      setTeachingLanguage(
-        data.teachingLanguage.length ? data.teachingLanguage : [""]
-      );
-      setTeachingCommitment(data.teachingCommitment || "");
-      setPreviewCVName(
-        data.CV ? "... " + data?.CV?.slice(-15) : "Upload your CV"
-      );
+      if (data) {
+        setTeachingLanguage(data.teachingLanguage);
 
-      setLanguageSkills(data.languageSkills || "");
-      setIsChecked(true);
-      setSendButtonAvailable(!data.status);
-      setApplicationStatus(data.status || "");
+        setTeachingCommitment(data.teachingCommitment);
+        setPreviewCVName("... " + data?.CV?.slice(-15));
+
+        setLanguageSkills(data.languageSkills);
+        setIsChecked(true);
+        setSendButtonAvailable(false);
+        setApplicationStatus(data.status);
+      } else {
+        setTeachingLanguage([""]);
+        setTeachingCommitment("");
+        setPreviewCVName("Upload your CV");
+        setLanguageSkills("");
+      }
     });
   }, [user._id]);
   const applicationSend = async () => {
@@ -148,8 +153,7 @@ export default function ApplyTeaching() {
           headers: {
             "Content-Type": "multipart/form-data",
             userId: user._id,
-          },
-          timeout: 5000,
+          }
         }
       );
       setSuccess("Your application has been sent successfully!");

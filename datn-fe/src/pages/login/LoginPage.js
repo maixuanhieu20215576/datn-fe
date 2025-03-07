@@ -63,6 +63,9 @@ export default function LoginPage() {
         if (user.role === "student") {
           setTimeout(() => navigate("/student"), 100);
         }
+        if (user.role === "admin") {
+          setTimeout(() => navigate("/admin"), 100);
+        }
       }
     } catch (error) {
       console.error(
