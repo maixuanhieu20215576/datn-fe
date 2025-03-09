@@ -5,7 +5,6 @@ import {
   TableContainer,
   Typography,
   Box,
-  InputLabel,
   Select,
   MenuItem,
   Table,
@@ -93,7 +92,7 @@ export default function ApplicationFormsManagement() {
     };
     setForceReRender(false);
     fetchData();
-  }, [filterStatus, forceReRender]); // Dependency array inside useEffect
+  }, [filterStatus, forceReRender, page, rowsPerPage]); // Dependency array inside useEffect
 
   const handleFilterStatusChanged = (event) => {
     setFilterStatus(event.target.value);
